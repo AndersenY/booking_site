@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Детали квартиры</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bookings/styles.css' %}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .info {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .info img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #calendar {
+            max-width: 600px;
+            margin: auto;
+            /* Центрирование календаря */
+            padding: 20px;
+        }
+
+        .booked {
+            background: #ffcccb;
+        }
+
+        h1 {
+            text-align: center;
+            /* Центрирование заголовка */
+            margin-bottom: 20px;
+            /* Отступ снизу */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Свободные даты</h1>
+        <div class="user-icon">
+            <img src="{% static 'bookings/user.png' %}" alt="User" />
+        </div>
+    </div>
+    <div class="container" style="margin-top: 20px;">
+        <div class="info">
+            <img src="{{ apartment.image }}" alt="Изображение квартиры">
+            <h3>{{ apartment.description }}</h3>
+            <p>Цена: {{ apartment.price_per_night }} ₽</p>
+            <a href="{{ apartment.link }}" target="_blank">Подробнее на DoskaYkt</a>
+        </div>
+
+        <div id="calendar"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bookedDates = [
+                {% for date in apartment.calendar.booked_dates %}
+                '{{ date }}',
+            {% endfor %}
+            ];
+
+        // Получаем текущую дату
+        const today = new Date();
+
+        // Создаём массив свободных дат
+        const availableDates = bookedDates
+            .map(date => new Date(date)) // Преобразуем даты в объекты Date
+            .filter(date => date >= today); // Оставляем только даты не раньше сегодняшнего дня
+
+        flatpickr("#calendar", {
+            inline: true,
+            minDate: "today", // Не показывать даты раньше сегодняшнего
+            // Показать все дни, кроме забронированных
+            onReady: function (selectedDates, dateStr, instance) {
+                // Меняем стиль для забронированных дат
+                bookedDates.forEach(date => {
+                    const dateEl = document.querySelector(`.flatpickr-day[data-date="${date}"]`);
+                    if (dateEl) {
+                        dateEl.classList.add('booked'); // Добавляем класс забронированным датам
+                    }
+                });
+            },
+            disable: bookedDates.map(date => new Date(date)) // Отключаем забронированные даты
+        });
+        });
+    </script>
+</body>
+
+</html>

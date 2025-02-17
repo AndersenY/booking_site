@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ykt.live</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bookings/styles.css' %}">
+    <link rel="icon" href="static/bookings/logo.png" type="image/x-icon">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('{% static "bookings/background.jpg" %}');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .tagline {
+            text-align: center;
+            color: white;
+        }
+
+        .booking-form-wrapper {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+        }
+
+        .apartment-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .apartment-card {
+            border: 1px solid #ccc;
+            border-radius: 30px 30px 0 0;
+            padding: 10px;
+            width: calc(33.333% - 20px);
+            box-sizing: border-box;
+            text-align: left;
+            background-color: white;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s;
+        }
+
+        .apartment-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .apartment-card img {
+            width: 100%;
+            border-radius: 30px;
+            height: auto;
+            display: block;
+        }
+
+        .apartment-card p.price {
+            color: #1e90ff;
+        }
+
+        .description-descr {
+            height: 80px;
+        }
+
+        .show-more-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .show-more-button {
+            margin-top: 40px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #1e90ff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .show-more-button:hover {
+            background-color: #1c86ee;
+        }
+
+        .show-more-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .footer p {
+            margin: 0;
+            color: #555;
+        }
+
+        .footer a {
+            color: #1e90ff;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1 class="ykt">Ykt.live</h1>
+        <div class="user-icon">
+            <img src="{% static 'bookings/user.png' %}" alt="User" />
+        </div>
+    </div>
+    <div class="combined-container">
+        <div class="tagline">
+            <h2>Ykt.live - просто арендуйте, просто живите!</h2>
+        </div>
+
+        <div class="booking-form-wrapper">
+            <form method="GET" action="{% url 'search_apartments' %}">
+                {% csrf_token %}
+                <div class="booking-form">
+                    <label for="check_in_date">Заезд</label>
+                    <input type="date" id="check_in_date" name="check_in_date" required>
+
+                    <label for="check_out_date">Выезд</label>
+                    <input type="date" id="check_out_date" name="check_out_date" required>
+
+                    <label for="guests">Гости</label>
+                    <input type="number" id="guests" name="guests" min="1" required>
+
+                    <button type="submit">Найти квартиры</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="container">
+        <div class="apartment-container">
+            {% for item in items %}
+            <div class="apartment-card">
+                {% if item.image %}
+                <img src="{{ item.image }}" alt="Изображение">
+                {% endif %}
+                {% if item.description %}
+                <p class="description-descr">{{ item.description }}</p>
+                {% endif %}
+                {% if item.price %}
+                <p class="price">Цена: {{ item.price }} ₽</p>
+                {% endif %}
+                <p><a href="{% url 'apartment_detail' item.id %}">Подробнее</a></p>
+            </div>
+            {% empty %}
+            <div class="apartment-card" style="flex-basis: 100%;">
+                <p>Нет доступных квартир</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="show-more-container">
+            <button class="show-more-button">Показать больше</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Ykt.live. Все права защищены.</p>
+        <p><a href="#">Политика конфиденциальности</a> | <a href="#">Условия использования</a></p>
+    </div>
+
+</body>
+
+</html>
